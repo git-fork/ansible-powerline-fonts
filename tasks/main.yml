@@ -1,7 +1,7 @@
 ---
 
 - name: install fontconfig
-  become: True
+  become: '{{ ansible_pkg_mgr | regex_search("brew$") | ternary(False, True) }}'
   package:
     state: present
     name: "{{ item }}"
@@ -23,7 +23,7 @@
     dest: "{{ item.homedir }}/.local/share/fonts"
     state: directory
     owner: "{{ item.user }}"
-    group: "{{ item.user }}"
+    group: "{{ item.group | default(omit) }}"
   with_items: "{{ all_users }}"
   tags:
     - powerline-fonts
@@ -41,7 +41,7 @@
     dest: "{{ item[0].homedir }}/.local/share/fonts/{{ item[1] }}"
     state: directory
     owner: "{{ item[0].user }}"
-    group: "{{ item[0].user }}"
+    group: "{{ item[0].group | default(omit) }}"
   with_nested:
    - "{{ all_users }}"
    - "{{ all_fonts }}"
